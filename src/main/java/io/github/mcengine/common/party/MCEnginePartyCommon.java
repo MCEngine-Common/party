@@ -4,6 +4,7 @@ import io.github.mcengine.common.party.database.IMCEnginePartyDB;
 import io.github.mcengine.common.party.database.mysql.MCEnginePartyMySQL;
 import io.github.mcengine.common.party.database.sqlite.MCEnginePartySQLite;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -152,5 +153,31 @@ public class MCEnginePartyCommon {
      */
     public String findPlayerPartyId(Player player) {
         return db.findPlayerPartyId(player);
+    }
+
+    /**
+     * Sets the name of the specified party, if the player is the owner.
+     *
+     * @param partyId The ID of the party
+     * @param player  The player attempting to set the party name
+     * @param name    The new party name to set
+     * @return true if the party name was set, false otherwise
+     */
+    public boolean setPartyName(String partyId, Player player, String name) {
+        return db.setPartyName(partyId, player, name);
+    }
+
+    /**
+     * Finds the party ID that the specified player belongs to by player name.
+     *
+     * @param playerName The name of the player to look up
+     * @return The party ID if found, or null
+     */
+    public String findPlayerPartyId(String playerName) {
+        Player player = Bukkit.getPlayerExact(playerName);
+        if (player != null) {
+            return db.findPlayerPartyId(player);
+        }
+        return null;
     }
 }
