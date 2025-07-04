@@ -43,4 +43,13 @@ public interface IMCEnginePartyDB {
      * @param player the player who is leaving the party
      */
     void leaveParty(Player player);
+
+    /**
+     * Checks if a player is a member of a specific party.
+     *
+     * @param partyId the ID of the party
+     * @param player the player to check
+     * @return true if the player is a member of the party
+     */
+    boolean isMember(String partyId, Player player);
 }
