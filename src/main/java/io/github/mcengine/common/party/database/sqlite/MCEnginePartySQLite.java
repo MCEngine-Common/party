@@ -48,6 +48,10 @@ public class MCEnginePartySQLite implements IMCEnginePartyDB {
         init();
     }
 
+    /**
+     * Initializes the SQLite tables for the party system if they do not already exist.
+     * This method must be called before any other database operations are performed.
+     */
     @Override
     public void init() {
         String createPartyTable = """
@@ -75,6 +79,12 @@ public class MCEnginePartySQLite implements IMCEnginePartyDB {
         }
     }
 
+    /**
+     * Creates a new party with the specified player as the owner and member.
+     * Inserts the player as both the owner in the party table and as a member in the party_member table.
+     *
+     * @param player the player who will be the owner of the new party
+     */
     @Override
     public void createParty(Player player) {
         String insertParty = "INSERT INTO party (party_owner_id) VALUES (?)";
@@ -100,6 +110,12 @@ public class MCEnginePartySQLite implements IMCEnginePartyDB {
         }
     }
 
+    /**
+     * Invites a player to an existing party by adding them as a member in the party_member table.
+     *
+     * @param party_id the ID of the party to which the player is being invited
+     * @param player the player to be invited to the party
+     */
     @Override
     public void invitePlayerToParty(String party_id, Player player) {
         String insertSql = "INSERT INTO party_member (party_member_id, party_id) VALUES (?, ?)";
@@ -114,6 +130,12 @@ public class MCEnginePartySQLite implements IMCEnginePartyDB {
         }
     }
 
+    /**
+     * Kicks a player from the specified party by removing their record from the party_member table.
+     *
+     * @param party_id the ID of the party
+     * @param player the player to be removed from the party
+     */
     @Override
     public void kickPlayerFromParty(String party_id, Player player) {
         String deleteSql = "DELETE FROM party_member WHERE party_id = ? AND party_member_id = ?";
@@ -128,6 +150,14 @@ public class MCEnginePartySQLite implements IMCEnginePartyDB {
         }
     }
 
+    /**
+     * Removes the player from the specified party.
+     * If the player is the owner, the entire party and its members will be deleted.
+     * If the player is a regular member, only their party_member record is removed.
+     *
+     * @param party_id the ID of the party
+     * @param player the player who is leaving the party
+     */
     @Override
     public void leaveParty(String party_id, Player player) {
         String checkOwnerSql = "SELECT party_owner_id FROM party WHERE party_id = ?";
@@ -159,6 +189,13 @@ public class MCEnginePartySQLite implements IMCEnginePartyDB {
         }
     }
 
+    /**
+     * Checks whether the specified player is a member of the specified party.
+     *
+     * @param party_id the ID of the party
+     * @param player the player to check
+     * @return true if the player is a member of the party, false otherwise
+     */
     @Override
     public boolean isMember(String party_id, Player player) {
         String sql = "SELECT 1 FROM party_member WHERE party_id = ? AND party_member_id = ? LIMIT 1";
