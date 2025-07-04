@@ -12,10 +12,14 @@ import java.sql.*;
  */
 public class MCEnginePartySQLite implements IMCEnginePartyDB {
 
-    /** The plugin instance used for configuration and logging. */
+    /** 
+     * The plugin instance used for configuration and logging. 
+     */
     private final Plugin plugin;
 
-    /** The persistent connection to the SQLite database. */
+    /** 
+     * The persistent connection to the SQLite database. 
+     */
     private final Connection conn;
 
     /**
@@ -49,7 +53,8 @@ public class MCEnginePartySQLite implements IMCEnginePartyDB {
         String createPartyTable = """
             CREATE TABLE IF NOT EXISTS party (
                 party_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                party_owner TEXT NOT NULL
+                party_owner TEXT NOT NULL,
+                party_name TEXT DEFAULT NULL
             );
         """;
 

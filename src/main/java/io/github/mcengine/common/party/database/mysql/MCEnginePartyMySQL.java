@@ -11,10 +11,14 @@ import java.sql.*;
  */
 public class MCEnginePartyMySQL implements IMCEnginePartyDB {
 
-    /** The plugin instance used for configuration and logging. */
+    /** 
+     * The plugin instance used for configuration and logging. 
+     */
     private final Plugin plugin;
 
-    /** The persistent connection to the MySQL database. */
+    /** 
+     * The persistent connection to the MySQL database. 
+     */
     private final Connection conn;
 
     /**
@@ -50,7 +54,8 @@ public class MCEnginePartyMySQL implements IMCEnginePartyDB {
         String createPartyTable = """
             CREATE TABLE IF NOT EXISTS party (
                 party_id INT AUTO_INCREMENT PRIMARY KEY,
-                party_owner VARCHAR(36) NOT NULL
+                party_owner VARCHAR(36) NOT NULL,
+                party_name VARCHAR(255) DEFAULT NULL
             );
         """;
 
