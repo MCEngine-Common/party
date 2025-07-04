@@ -55,4 +55,11 @@ public interface IMCEnginePartyDB {
      * @return true if the player is a member of the party, false otherwise
      */
     boolean isMember(String party_id, Player player);
+
+    /**
+     * Executes one or more raw SQL statements.
+     *
+     * @param sqls an array of SQL statements to execute
+     */
+    void executeSqls(String[] sqls);
 }
