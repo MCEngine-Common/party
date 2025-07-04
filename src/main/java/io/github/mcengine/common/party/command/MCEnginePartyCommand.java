@@ -17,6 +17,8 @@ import org.bukkit.entity.Player;
  *     <li>/party invite &lt;player&gt;</li>
  *     <li>/party kick &lt;player&gt;</li>
  *     <li>/party leave</li>
+ *     <li>/party set name &lt;name&gt;</li>
+ *     <li>/party find &lt;player&gt; (requires permission "mcengine.party.find")</li>
  * </ul>
  */
 public class MCEnginePartyCommand implements CommandExecutor {
@@ -52,7 +54,7 @@ public class MCEnginePartyCommand implements CommandExecutor {
         }
 
         if (args.length == 0) {
-            player.sendMessage(ChatColor.YELLOW + "Party commands: /party create, /party invite <player>, /party kick <player>, /party leave");
+            player.sendMessage(ChatColor.YELLOW + "Party commands: /party create, /party invite <player>, /party kick <player>, /party leave, /party set name <name>, /party find <player>");
             return true;
         }
 
@@ -73,7 +75,22 @@ public class MCEnginePartyCommand implements CommandExecutor {
                 }
             }
             case "leave" -> MCEnginePartyCommandUtil.handleLeave(player, partyCommon);
-            default -> player.sendMessage(ChatColor.YELLOW + "Unknown party command. Try: /party create, /party invite <player>, /party kick <player>, /party leave");
+            case "set" -> {
+                if (args.length >= 3 && args[1].equalsIgnoreCase("name")) {
+                    String name = String.join(" ", java.util.Arrays.copyOfRange(args, 2, args.length));
+                    MCEnginePartyCommandUtil.handleSetName(player, name, partyCommon);
+                } else {
+                    player.sendMessage(ChatColor.RED + "Usage: /party set name <name>");
+                }
+            }
+            case "find" -> {
+                if (args.length < 2) {
+                    player.sendMessage(ChatColor.RED + "Usage: /party find <player>");
+                } else {
+                    MCEnginePartyCommandUtil.handleFind(player, args[1], partyCommon);
+                }
+            }
+            default -> player.sendMessage(ChatColor.YELLOW + "Unknown party command. Try: /party create, /party invite <player>, /party kick <player>, /party leave, /party set name <name>, /party find <player>");
         }
         return true;
     }
