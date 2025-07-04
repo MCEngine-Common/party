@@ -1,4 +1,4 @@
-package io.github.mcengine.common.tabcompleter;
+package io.github.mcengine.common.party.tabcompleter;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
