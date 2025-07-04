@@ -25,8 +25,9 @@ public class MCEnginePartySQLite implements IMCEnginePartyDB {
      */
     public MCEnginePartySQLite(Plugin plugin) {
         this.plugin = plugin;
+        String fileName = plugin.getConfig().getString("database.sqlite.path", "party.db");
 
-        File dbFile = new File(plugin.getDataFolder(), "party.db");
+        File dbFile = new File(plugin.getDataFolder(), fileName);
         if (!plugin.getDataFolder().exists()) {
             plugin.getDataFolder().mkdirs();
         }
