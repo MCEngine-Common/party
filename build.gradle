@@ -44,9 +44,26 @@ repositories {
 
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url = 'https://oss.sonatype.org/content/repositories/central' }
+
+    ext.configureGitHubRepo = { repoName, repoUrl ->
+            maven {
+                name = repoName
+                url = uri(repoUrl)
+                credentials {
+                    username = project.user_git_name
+                    password = project.user_github_token ?: project.repository_token ?: project.organization_token
+                }
+            }
+        }
+
+        configureGitHubRepo('MCEngine Core API', 'https://maven.pkg.github.com/MCEngine/core-api')
+        configureGitHubRepo('MCEngine Party API', 'https://maven.pkg.github.com/MCEngine/party-api')
 }
 
 dependencies {
+    compileOnly 'io.github.mcengine:core-api:1.0.5-RELEASE'
+    compileOnly 'io.github.mcengine:party-api:1.0.0-SNAPSHOT'
+
     compileOnly 'com.google.code.gson:gson:2.13.1'
     compileOnly 'org.spigotmc:spigot-api:1.21.7-R0.1-SNAPSHOT'
     compileOnly 'org.mongodb:mongodb-driver-sync:5.5.1'
