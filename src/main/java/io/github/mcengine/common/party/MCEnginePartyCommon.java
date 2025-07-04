@@ -13,7 +13,9 @@ import org.bukkit.plugin.Plugin;
  */
 public class MCEnginePartyCommon {
 
-    /** Singleton instance of the Party Common manager. */
+    /**
+     * Singleton instance of the Party Common manager.
+     */
     private static MCEnginePartyCommon instance;
 
     /**
@@ -140,5 +142,15 @@ public class MCEnginePartyCommon {
      */
     public String getPlayerPartyRole(String partyId, Player player) {
         return db.getPlayerPartyRole(partyId, player);
+    }
+
+    /**
+     * Finds the party ID the player belongs to, or null if not in a party.
+     *
+     * @param player The player to check
+     * @return The party ID if found, or null
+     */
+    public String findPlayerPartyId(Player player) {
+        return db.findPlayerPartyId(player);
     }
 }

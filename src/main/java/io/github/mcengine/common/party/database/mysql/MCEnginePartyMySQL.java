@@ -268,4 +268,43 @@ public class MCEnginePartyMySQL implements IMCEnginePartyDB {
 
         return null;
     }
+
+    /**
+     * Finds the party ID that the specified player belongs to.
+     * Returns the party ID as a string if the player is in a party, or null if not found.
+     *
+     * @param player the player to look up
+     * @return party ID if found, or null
+     */
+    @Override
+    public String findPlayerPartyId(Player player) {
+        String uuid = player.getUniqueId().toString();
+        // Check if player is a party owner
+        String sqlOwner = "SELECT party_id FROM party WHERE party_owner = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sqlOwner)) {
+            stmt.setString(1, uuid);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return String.valueOf(rs.getInt("party_id"));
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().warning("Failed to check party ownership: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        // Check if player is a party member
+        String sqlMember = "SELECT party_id FROM party_member WHERE party_member_id = ? LIMIT 1";
+        try (PreparedStatement stmt = conn.prepareStatement(sqlMember)) {
+            stmt.setString(1, uuid);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return String.valueOf(rs.getInt("party_id"));
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().warning("Failed to check party membership: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }

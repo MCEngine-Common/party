@@ -81,4 +81,13 @@ public interface IMCEnginePartyDB {
      * @return "owner", "member", or null
      */
     String getPlayerPartyRole(String party_id, Player player);
+
+    /**
+     * Finds the party ID that the specified player belongs to.
+     * Returns the party ID as a string if the player is in a party, or null if not found.
+     *
+     * @param player the player to look up
+     * @return party ID if found, or null
+     */
+    String findPlayerPartyId(Player player);
 }
