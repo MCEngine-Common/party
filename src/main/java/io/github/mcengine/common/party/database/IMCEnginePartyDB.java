@@ -30,10 +30,9 @@ public interface IMCEnginePartyDB {
 
     /**
      * Removes a player from the specified party.
-     * This operation is typically performed by the party owner.
      *
      * @param party_id the ID of the party
-     * @param player the player to be removed from the party
+     * @param player the player to be removed
      */
     void kickPlayerFromParty(String party_id, Player player);
 
@@ -43,7 +42,7 @@ public interface IMCEnginePartyDB {
      * If the player is a member, they will simply leave the party.
      *
      * @param party_id the ID of the party
-     * @param player the player who is leaving the party
+     * @param player the player who is leaving
      */
     void leaveParty(String party_id, Player player);
 
@@ -57,19 +56,29 @@ public interface IMCEnginePartyDB {
     boolean isMember(String party_id, Player player);
 
     /**
-     * Executes one or more raw SQL statements.
+     * Executes one or more raw SQL statements directly against the database.
      *
      * @param sqls an array of SQL statements to execute
      */
     void executeSqls(String[] sqls);
 
     /**
-     * Sets or changes the party name, if the given player is the party owner.
+     * Sets the party name if the given player is the owner of the party.
      *
      * @param party_id the ID of the party
      * @param player the player attempting to set the name
      * @param name the new name for the party
-     * @return true if name was set successfully, false otherwise (e.g. not owner)
+     * @return true if the name was set, false otherwise
      */
     boolean setPartyName(String party_id, Player player, String name);
+
+    /**
+     * Gets the role of the specified player in the party.
+     * Returns "owner" if the player is the owner, "member" if they are a member, or null if not found.
+     *
+     * @param party_id the ID of the party
+     * @param player the player whose role is to be checked
+     * @return "owner", "member", or null
+     */
+    String getPlayerPartyRole(String party_id, Player player);
 }

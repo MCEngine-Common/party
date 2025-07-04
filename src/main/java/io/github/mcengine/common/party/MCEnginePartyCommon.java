@@ -7,8 +7,6 @@ import io.github.mcengine.common.party.database.sqlite.MCEnginePartySQLite;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.sql.Connection;
-
 /**
  * Common logic handler for the MCEngine Party plugin.
  * Handles database backend initialization and provides access to party data methods.
@@ -18,10 +16,14 @@ public class MCEnginePartyCommon {
     /** Singleton instance of the Party Common manager. */
     private static MCEnginePartyCommon instance;
 
-    /** The database implementation used for party data. */
+    /**
+     * The database implementation used for party data.
+     */
     private final IMCEnginePartyDB db;
 
-    /** The Bukkit plugin instance. */
+    /**
+     * The Bukkit plugin instance.
+     */
     private final Plugin plugin;
 
     /**
@@ -126,5 +128,17 @@ public class MCEnginePartyCommon {
      */
     public void executeSqls(String[] sqls) {
         db.executeSqls(sqls);
+    }
+
+    /**
+     * Gets the role of the specified player in the party.
+     * Returns "owner" if the player is the owner, "member" if they are a member, or null if not found.
+     *
+     * @param partyId the ID of the party
+     * @param player the player whose role is to be checked
+     * @return "owner", "member", or null
+     */
+    public String getPlayerPartyRole(String partyId, Player player) {
+        return db.getPlayerPartyRole(partyId, player);
     }
 }

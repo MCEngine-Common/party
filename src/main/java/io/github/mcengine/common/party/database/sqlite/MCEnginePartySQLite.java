@@ -224,4 +224,46 @@ public class MCEnginePartySQLite implements IMCEnginePartyDB {
         }
         return false;
     }
+
+    /**
+     * Gets the role of the specified player in the party.
+     * Returns "owner" if the player is the owner, "member" if they are a member, or null if not found.
+     *
+     * @param party_id the ID of the party
+     * @param player the player whose role is to be checked
+     * @return "owner", "member", or null
+     */
+    @Override
+    public String getPlayerPartyRole(String party_id, Player player) {
+        String uuid = player.getUniqueId().toString();
+        String checkOwnerSql = "SELECT party_owner FROM party WHERE party_id = ?";
+        String checkMemberSql = "SELECT 1 FROM party_member WHERE party_id = ? AND party_member_id = ? LIMIT 1";
+
+        try (PreparedStatement ownerStmt = conn.prepareStatement(checkOwnerSql)) {
+            ownerStmt.setInt(1, Integer.parseInt(party_id));
+            ResultSet ownerRs = ownerStmt.executeQuery();
+            if (ownerRs.next()) {
+                if (uuid.equals(ownerRs.getString("party_owner"))) {
+                    return "owner";
+                }
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().warning("Failed to check party owner in SQLite: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        try (PreparedStatement memberStmt = conn.prepareStatement(checkMemberSql)) {
+            memberStmt.setInt(1, Integer.parseInt(party_id));
+            memberStmt.setString(2, uuid);
+            ResultSet memberRs = memberStmt.executeQuery();
+            if (memberRs.next()) {
+                return "member";
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().warning("Failed to check party member in SQLite: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }
