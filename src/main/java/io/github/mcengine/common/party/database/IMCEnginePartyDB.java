@@ -62,4 +62,14 @@ public interface IMCEnginePartyDB {
      * @param sqls an array of SQL statements to execute
      */
     void executeSqls(String[] sqls);
+
+    /**
+     * Sets or changes the party name, if the given player is the party owner.
+     *
+     * @param party_id the ID of the party
+     * @param player the player attempting to set the name
+     * @param name the new name for the party
+     * @return true if name was set successfully, false otherwise (e.g. not owner)
+     */
+    boolean setPartyName(String party_id, Player player, String name);
 }

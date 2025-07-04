@@ -12,13 +12,13 @@ import java.sql.*;
  */
 public class MCEnginePartySQLite implements IMCEnginePartyDB {
 
-    /** 
-     * The plugin instance used for configuration and logging. 
+    /**
+     * The plugin instance used for configuration and logging.
      */
     private final Plugin plugin;
 
-    /** 
-     * The persistent connection to the SQLite database. 
+    /**
+     * The persistent connection to the SQLite database.
      */
     private final Connection conn;
 
@@ -190,5 +190,38 @@ public class MCEnginePartySQLite implements IMCEnginePartyDB {
             plugin.getLogger().warning("Failed to execute external SQL in SQLite: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Sets the party name if the given player is the owner of the party.
+     *
+     * @param party_id the ID of the party
+     * @param player the player attempting to set the name
+     * @param name the new name for the party
+     * @return true if the name was set, false otherwise
+     */
+    @Override
+    public boolean setPartyName(String party_id, Player player, String name) {
+        String checkOwnerSql = "SELECT party_owner FROM party WHERE party_id = ?";
+        String updateNameSql = "UPDATE party SET party_name = ? WHERE party_id = ?";
+        try (PreparedStatement checkStmt = conn.prepareStatement(checkOwnerSql)) {
+            checkStmt.setInt(1, Integer.parseInt(party_id));
+            ResultSet rs = checkStmt.executeQuery();
+            if (rs.next()) {
+                String ownerUuid = rs.getString("party_owner");
+                if (ownerUuid.equals(player.getUniqueId().toString())) {
+                    try (PreparedStatement updateStmt = conn.prepareStatement(updateNameSql)) {
+                        updateStmt.setString(1, name);
+                        updateStmt.setInt(2, Integer.parseInt(party_id));
+                        updateStmt.executeUpdate();
+                        return true;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().warning("Failed to set party name in SQLite: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
     }
 }
