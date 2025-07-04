@@ -21,35 +21,38 @@ public interface IMCEnginePartyDB {
     void createParty(Player player);
 
     /**
-     * Invites another player to the party of which the caller is a member or owner.
+     * Invites another player to the specified party.
      *
+     * @param party_id the ID of the party to which the player is being invited
      * @param player the player to be invited to the party
      */
-    void invitePlayerToParty(Player player);
+    void invitePlayerToParty(String party_id, Player player);
 
     /**
-     * Removes a player from the party.
+     * Removes a player from the specified party.
      * This operation is typically performed by the party owner.
      *
+     * @param party_id the ID of the party
      * @param player the player to be removed from the party
      */
-    void kickPlayerFromParty(Player player);
+    void kickPlayerFromParty(String party_id, Player player);
 
     /**
-     * Removes the player from their current party.
+     * Removes the player from the specified party.
      * If the player is the owner, the party will be disbanded.
      * If the player is a member, they will simply leave the party.
      *
+     * @param party_id the ID of the party
      * @param player the player who is leaving the party
      */
-    void leaveParty(Player player);
+    void leaveParty(String party_id, Player player);
 
     /**
      * Checks if a player is a member of a specific party.
      *
-     * @param partyId the ID of the party
+     * @param party_id the ID of the party
      * @param player the player to check
-     * @return true if the player is a member of the party
+     * @return true if the player is a member of the party, false otherwise
      */
-    boolean isMember(String partyId, Player player);
+    boolean isMember(String party_id, Player player);
 }
