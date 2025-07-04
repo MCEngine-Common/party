@@ -13,8 +13,9 @@ import java.util.List;
 /**
  * Tab completer for the /party command and its subcommands.
  * <p>
- * - First argument: suggests create, invite, kick, leave.
- * - Second argument (for invite and kick): suggests online player names.
+ * - First argument: suggests create, invite, kick, leave, set, find.
+ * - Second argument: for invite/kick/find, suggests online player names.
+ * - For /party set, suggests "name" as the second argument.
  */
 public class MCEnginePartyCompleter implements TabCompleter {
 
@@ -29,6 +30,8 @@ public class MCEnginePartyCompleter implements TabCompleter {
         cmds.add("invite");
         cmds.add("kick");
         cmds.add("leave");
+        cmds.add("set");
+        cmds.add("find");
         MAIN_COMMANDS = Collections.unmodifiableList(cmds);
     }
 
@@ -59,10 +62,10 @@ public class MCEnginePartyCompleter implements TabCompleter {
             return completions;
         }
 
-        // /party invite <player> or /party kick <player>
+        // /party invite <player> or /party kick <player> or /party find <player>
         if (args.length == 2) {
             String sub = args[0].toLowerCase();
-            if (sub.equals("invite") || sub.equals("kick")) {
+            if (sub.equals("invite") || sub.equals("kick") || sub.equals("find")) {
                 String current = args[1].toLowerCase();
                 List<String> suggestions = new ArrayList<>();
                 for (Player online : Bukkit.getOnlinePlayers()) {
@@ -74,7 +77,23 @@ public class MCEnginePartyCompleter implements TabCompleter {
                 }
                 return suggestions;
             }
+            // /party set <...>
+            if (sub.equals("set")) {
+                List<String> completions = new ArrayList<>();
+                String current = args[1].toLowerCase();
+                if ("name".startsWith(current)) {
+                    completions.add("name");
+                }
+                return completions;
+            }
         }
+
+        // /party set name <name...>
+        if (args.length == 3 && args[0].equalsIgnoreCase("set") && args[1].equalsIgnoreCase("name")) {
+            // No completion for free-text party name, but could suggest example if desired.
+            return Collections.emptyList();
+        }
+
         return Collections.emptyList();
     }
 }
