@@ -54,7 +54,7 @@ public class MCEnginePartyMySQL implements IMCEnginePartyDB {
         String createPartyTable = """
             CREATE TABLE IF NOT EXISTS party (
                 party_id INT AUTO_INCREMENT PRIMARY KEY,
-                party_owner VARCHAR(36) NOT NULL,
+                party_owner_id VARCHAR(36) NOT NULL,
                 party_name VARCHAR(255) DEFAULT NULL
             );
         """;
@@ -78,7 +78,7 @@ public class MCEnginePartyMySQL implements IMCEnginePartyDB {
 
     @Override
     public void createParty(Player player) {
-        String insertParty = "INSERT INTO party (party_owner) VALUES (?)";
+        String insertParty = "INSERT INTO party (party_owner_id) VALUES (?)";
         String insertMember = "INSERT INTO party_member (party_member_id, party_id) VALUES (?, ?)";
 
         try (PreparedStatement stmt = conn.prepareStatement(insertParty, Statement.RETURN_GENERATED_KEYS)) {
@@ -131,14 +131,14 @@ public class MCEnginePartyMySQL implements IMCEnginePartyDB {
 
     @Override
     public void leaveParty(String party_id, Player player) {
-        String checkOwnerSql = "SELECT party_owner FROM party WHERE party_id = ?";
+        String checkOwnerSql = "SELECT party_owner_id FROM party WHERE party_id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(checkOwnerSql)) {
             stmt.setInt(1, Integer.parseInt(party_id));
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                String ownerUuid = rs.getString("party_owner");
+                String ownerUuid = rs.getString("party_owner_id");
                 if (ownerUuid.equals(player.getUniqueId().toString())) {
                     // Owner: delete party and members
                     try (
@@ -204,13 +204,13 @@ public class MCEnginePartyMySQL implements IMCEnginePartyDB {
      */
     @Override
     public boolean setPartyName(String party_id, Player player, String name) {
-        String checkOwnerSql = "SELECT party_owner FROM party WHERE party_id = ?";
+        String checkOwnerSql = "SELECT party_owner_id FROM party WHERE party_id = ?";
         String updateNameSql = "UPDATE party SET party_name = ? WHERE party_id = ?";
         try (PreparedStatement checkStmt = conn.prepareStatement(checkOwnerSql)) {
             checkStmt.setInt(1, Integer.parseInt(party_id));
             ResultSet rs = checkStmt.executeQuery();
             if (rs.next()) {
-                String ownerUuid = rs.getString("party_owner");
+                String ownerUuid = rs.getString("party_owner_id");
                 if (ownerUuid.equals(player.getUniqueId().toString())) {
                     try (PreparedStatement updateStmt = conn.prepareStatement(updateNameSql)) {
                         updateStmt.setString(1, name);
@@ -238,14 +238,14 @@ public class MCEnginePartyMySQL implements IMCEnginePartyDB {
     @Override
     public String getPlayerPartyRole(String party_id, Player player) {
         String uuid = player.getUniqueId().toString();
-        String checkOwnerSql = "SELECT party_owner FROM party WHERE party_id = ?";
+        String checkOwnerSql = "SELECT party_owner_id FROM party WHERE party_id = ?";
         String checkMemberSql = "SELECT 1 FROM party_member WHERE party_id = ? AND party_member_id = ? LIMIT 1";
 
         try (PreparedStatement ownerStmt = conn.prepareStatement(checkOwnerSql)) {
             ownerStmt.setInt(1, Integer.parseInt(party_id));
             ResultSet ownerRs = ownerStmt.executeQuery();
             if (ownerRs.next()) {
-                if (uuid.equals(ownerRs.getString("party_owner"))) {
+                if (uuid.equals(ownerRs.getString("party_owner_id"))) {
                     return "owner";
                 }
             }
@@ -280,7 +280,7 @@ public class MCEnginePartyMySQL implements IMCEnginePartyDB {
     public String findPlayerPartyId(Player player) {
         String uuid = player.getUniqueId().toString();
         // Check if player is a party owner
-        String sqlOwner = "SELECT party_id FROM party WHERE party_owner = ?";
+        String sqlOwner = "SELECT party_id FROM party WHERE party_owner_id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sqlOwner)) {
             stmt.setString(1, uuid);
             ResultSet rs = stmt.executeQuery();
