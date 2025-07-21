@@ -58,13 +58,13 @@ repositories {
             }
         }
 
-        configureGitHubRepo('MCEngine Core API', 'https://maven.pkg.github.com/MCEngine/core-api')
-        configureGitHubRepo('MCEngine Party API', 'https://maven.pkg.github.com/MCEngine/party-api')
+        configureGitHubRepo('MCEngine Core API', 'https://maven.pkg.github.com/MCEngine-API/core')
+        configureGitHubRepo('MCEngine Party API', 'https://maven.pkg.github.com/MCEngine-API/party')
 }
 
 dependencies {
-    compileOnly 'io.github.mcengine:core-api:1.0.5-RELEASE'
-    compileOnly 'io.github.mcengine:party-api:1.0.0-SNAPSHOT'
+    compileOnly 'io.github.mcengine:core-api:2025.0.7-22'
+    compileOnly 'io.github.mcengine:party-api:2025.0.7-22'
 
     compileOnly 'com.google.code.gson:gson:2.13.1'
     compileOnly 'org.spigotmc:spigot-api:1.21.8-R0.1-SNAPSHOT'
