@@ -24,7 +24,8 @@ import org.bukkit.entity.Player;
 public class MCEnginePartyCommand implements CommandExecutor {
 
     /**
-     * Reference to the party API for handling core party logic.
+     * Reference to the party API for handling core party logic, including
+     * configured party size limits and current member counts.
      */
     private final MCEnginePartyCommon partyCommon;
 
@@ -64,6 +65,20 @@ public class MCEnginePartyCommand implements CommandExecutor {
                 if (args.length < 2) {
                     player.sendMessage(ChatColor.RED + "Usage: /party invite <player>");
                 } else {
+                    // Enforce party size limit before attempting to invite.
+                    // Limit is read from config via MCEnginePartyCommon#getPartyLimit().
+                    // A limit of 0 means unlimited size.
+                    int limit = partyCommon.getPartyLimit();
+                    if (limit > 0) {
+                        String inviterPartyId = partyCommon.findPlayerPartyId(player);
+                        if (inviterPartyId != null) {
+                            int count = partyCommon.getPartyCount(inviterPartyId);
+                            if (count >= limit) {
+                                player.sendMessage(ChatColor.RED + "Your party is full (" + count + "/" + limit + ").");
+                                return true;
+                            }
+                        }
+                    }
                     MCEnginePartyCommandUtil.handleInvite(player, args[1], partyCommon);
                 }
             }
