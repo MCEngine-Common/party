@@ -1,10 +1,13 @@
 package io.github.mcengine.common.party;
 
+import io.github.mcengine.api.core.util.MCEngineCoreApiDispatcher;
 import io.github.mcengine.common.party.database.IMCEnginePartyDB;
 import io.github.mcengine.common.party.database.mysql.MCEnginePartyMySQL;
 import io.github.mcengine.common.party.database.sqlite.MCEnginePartySQLite;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -35,6 +38,11 @@ public class MCEnginePartyCommon {
     private final int partyLimit;
 
     /**
+     * Internal command dispatcher used for registering command namespaces and subcommands.
+     */
+    private final MCEngineCoreApiDispatcher dispatcher;
+
+    /**
      * Constructs a new Party Common handler.
      * Initializes the appropriate database backend based on plugin config.
      *
@@ -52,6 +60,7 @@ public class MCEnginePartyCommon {
         this.plugin = plugin;
         // Read the party limit from config.yml (key: "limit"). Default is 6. 0 means no limit.
         this.partyLimit = plugin.getConfig().getInt("limit", 6);
+        this.dispatcher = new MCEngineCoreApiDispatcher();
 
         String dbType = plugin.getConfig().getString("database.type", "sqlite").toLowerCase();
         switch (dbType) {
@@ -87,6 +96,57 @@ public class MCEnginePartyCommon {
      */
     public int getPartyLimit() {
         return partyLimit;
+    }
+
+    /**
+     * Registers a command namespace (e.g. {@code "party"}) for this plugin's dispatcher.
+     *
+     * @param namespace unique namespace for commands
+     */
+    public void registerNamespace(String namespace) {
+        dispatcher.registerNamespace(namespace);
+    }
+
+    /**
+     * Binds a Bukkit command (like {@code /party}) to the internal dispatcher.
+     *
+     * @param namespace       the command namespace
+     * @param commandExecutor fallback executor for unmatched subcommands
+     */
+    public void bindNamespaceToCommand(String namespace, CommandExecutor commandExecutor) {
+        dispatcher.bindNamespaceToCommand(namespace, commandExecutor);
+    }
+
+    /**
+     * Registers a subcommand under the specified namespace.
+     *
+     * @param namespace the command namespace
+     * @param name      subcommand label
+     * @param executor  subcommand logic
+     */
+    public void registerSubCommand(String namespace, String name, CommandExecutor executor) {
+        dispatcher.registerSubCommand(namespace, name, executor);
+    }
+
+    /**
+     * Registers a tab completer for a subcommand under the specified namespace.
+     *
+     * @param namespace    the command namespace
+     * @param subcommand   subcommand label
+     * @param tabCompleter tab completion logic
+     */
+    public void registerSubTabCompleter(String namespace, String subcommand, TabCompleter tabCompleter) {
+        dispatcher.registerSubTabCompleter(namespace, subcommand, tabCompleter);
+    }
+
+    /**
+     * Gets the dispatcher instance to assign as command executor and tab completer.
+     *
+     * @param namespace command namespace
+     * @return command executor for Bukkit command registration
+     */
+    public CommandExecutor getDispatcher(String namespace) {
+        return dispatcher.getDispatcher(namespace);
     }
 
     /**
@@ -163,7 +223,8 @@ public class MCEnginePartyCommon {
 
     /**
      * Gets the role of the specified player in the party.
-     * Returns "owner" if the player is the owner, "member" if they are a member, or null if not found.
+     * Returns {@code "owner"} if the player is the owner, {@code "member"} if they are a member,
+     * or {@code null} if not found.
      *
      * @param partyId the ID of the party
      * @param player the player whose role is to be checked
@@ -174,7 +235,7 @@ public class MCEnginePartyCommon {
     }
 
     /**
-     * Finds the party ID the player belongs to, or null if not in a party.
+     * Finds the party ID the player belongs to, or {@code null} if not in a party.
      *
      * @param player The player to check
      * @return The party ID if found, or null
