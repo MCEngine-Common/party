@@ -1,5 +1,6 @@
 package io.github.mcengine.common.party.command;
 
+import io.github.mcengine.api.hologram.MCEngineHologramApi;
 import io.github.mcengine.common.party.MCEnginePartyCommon;
 import io.github.mcengine.common.party.util.MCEnginePartyCommandUtil;
 import org.bukkit.ChatColor;
@@ -39,7 +40,20 @@ public class MCEnginePartyCommand implements CommandExecutor {
     private static final String MAIN_SUBCOMMAND = "default";
 
     /**
-     * Canonical usage lines (without the leading "Usage:" label) for help output.
+     * The command prefix suggested to the user when they interact with the usage hologram.
+     * This is used by {@link MCEngineHologramApi#getUsageHologram(Player, String, String[])} to
+     * prefill chat input on click.
+     */
+    private static final String SUGGEST_PREFIX = "/party default ";
+
+    /**
+     * Default number of seconds the usage hologram should remain visible.
+     */
+    private static final int DEFAULT_HOLOGRAM_SECONDS = 10;
+
+    /**
+     * Canonical usage lines (without the leading "Usage:" label). These lines are rendered
+     * both in chat and inside the usage hologram to ensure consistency.
      */
     private static final String[] USAGE_LINES = new String[]{
             "/party default create",
@@ -78,18 +92,21 @@ public class MCEnginePartyCommand implements CommandExecutor {
         // Must be at least: /party default
         if (args.length == 0) {
             sendUsage(player);
+            showUsageHologram(player);
             return true;
         }
 
         // Enforce the new "/party default ..." structure
         if (!MAIN_SUBCOMMAND.equalsIgnoreCase(args[0])) {
             sendUsage(player);
+            showUsageHologram(player);
             return true;
         }
 
         // Must have an actual subcommand after "default"
         if (args.length == 1) {
             sendUsage(player);
+            showUsageHologram(player);
             return true;
         }
 
@@ -100,6 +117,7 @@ public class MCEnginePartyCommand implements CommandExecutor {
             case "invite" -> {
                 if (args.length < 3) {
                     player.sendMessage(ChatColor.RED + "Usage: /party default invite <player>");
+                    showUsageHologram(player);
                 } else {
                     // Enforce party size limit before attempting to invite.
                     // Limit is read from config via MCEnginePartyCommon#getPartyLimit().
@@ -122,6 +140,7 @@ public class MCEnginePartyCommand implements CommandExecutor {
             case "kick" -> {
                 if (args.length < 3) {
                     player.sendMessage(ChatColor.RED + "Usage: /party default kick <player>");
+                    showUsageHologram(player);
                 } else {
                     MCEnginePartyCommandUtil.handleKick(player, args[2], partyCommon);
                 }
@@ -135,18 +154,23 @@ public class MCEnginePartyCommand implements CommandExecutor {
                     MCEnginePartyCommandUtil.handleSetName(player, name, partyCommon);
                 } else {
                     player.sendMessage(ChatColor.RED + "Usage: /party default set name <name>");
+                    showUsageHologram(player);
                 }
             }
 
             case "find" -> {
                 if (args.length < 3) {
                     player.sendMessage(ChatColor.RED + "Usage: /party default find <player>");
+                    showUsageHologram(player);
                 } else {
                     MCEnginePartyCommandUtil.handleFind(player, args[2], partyCommon);
                 }
             }
 
-            default -> sendUsage(player);
+            default -> {
+                sendUsage(player);
+                showUsageHologram(player);
+            }
         }
         return true;
     }
@@ -161,5 +185,15 @@ public class MCEnginePartyCommand implements CommandExecutor {
         for (String line : USAGE_LINES) {
             player.sendMessage(ChatColor.GRAY + line);
         }
+    }
+
+    /**
+     * Displays a usage hologram to the player with clickable suggestions that prefill chat input.
+     *
+     * @param player the recipient of the hologram
+     */
+    private void showUsageHologram(Player player) {
+        new MCEngineHologramApi()
+                .getUsageHologram(player, SUGGEST_PREFIX, USAGE_LINES);
     }
 }
