@@ -342,4 +342,26 @@ public class MCEnginePartySQLite implements IMCEnginePartyDB {
 
         return null;
     }
+
+    /**
+     * Gets the number of members currently in the specified party.
+     *
+     * @param party_id the ID of the party
+     * @return the count of members in the party
+     */
+    @Override
+    public int getPartyCount(String party_id) {
+        String sql = "SELECT COUNT(*) AS cnt FROM party_member WHERE party_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, Integer.parseInt(party_id));
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("cnt");
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().warning("Failed to get party count in SQLite: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }

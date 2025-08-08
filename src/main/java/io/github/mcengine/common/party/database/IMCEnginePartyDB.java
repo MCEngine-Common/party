@@ -90,4 +90,12 @@ public interface IMCEnginePartyDB {
      * @return party ID if found, or null
      */
     String findPlayerPartyId(Player player);
+
+    /**
+     * Gets the number of members currently in the specified party.
+     *
+     * @param party_id the ID of the party
+     * @return the count of members in the party
+     */
+    int getPartyCount(String party_id);
 }

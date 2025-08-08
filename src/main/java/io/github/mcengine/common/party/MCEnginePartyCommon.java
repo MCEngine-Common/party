@@ -30,6 +30,11 @@ public class MCEnginePartyCommon {
     private final Plugin plugin;
 
     /**
+     * Configured party size limit. A value of {@code 0} means unlimited.
+     */
+    private final int partyLimit;
+
+    /**
      * Constructs a new Party Common handler.
      * Initializes the appropriate database backend based on plugin config.
      *
@@ -40,10 +45,13 @@ public class MCEnginePartyCommon {
      * </ul>
      *
      * @param plugin the Bukkit plugin instance
+     * @throws IllegalArgumentException if the configured database type is not supported
      */
     public MCEnginePartyCommon(Plugin plugin) {
         instance = this;
         this.plugin = plugin;
+        // Read the party limit from config.yml (key: "limit"). Default is 6. 0 means no limit.
+        this.partyLimit = plugin.getConfig().getInt("limit", 6);
 
         String dbType = plugin.getConfig().getString("database.type", "sqlite").toLowerCase();
         switch (dbType) {
@@ -69,6 +77,26 @@ public class MCEnginePartyCommon {
      */
     public Plugin getPlugin() {
         return plugin;
+    }
+
+    /**
+     * Gets the configured party limit from {@code config.yml}.
+     * A value of {@code 0} indicates there is no limit.
+     *
+     * @return the party size limit, or {@code 0} for unlimited
+     */
+    public int getPartyLimit() {
+        return partyLimit;
+    }
+
+    /**
+     * Gets the current number of members in a given party.
+     *
+     * @param partyId the ID of the party
+     * @return the number of members currently in the party
+     */
+    public int getPartyCount(String partyId) {
+        return db.getPartyCount(partyId);
     }
 
     /**
